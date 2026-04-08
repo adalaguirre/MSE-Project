@@ -22,3 +22,5 @@ HEAD
 | Daniel Lopez | [@lopezdaniel-web](https://github.com/lopezdaniel-web)|
 | (Compañero 3) | @username |
 e4ead6d1e1221a35ee6b1aeffc962dc39150f90d
+
+| Adrian Amaro | [@adrianamaro-source](https://github.com/adrianamaro-source) |
