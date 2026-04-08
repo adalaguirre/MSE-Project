@@ -10,5 +10,5 @@
 | Name | GitHub |
 |------|--------|
 | Adal Aguirre | [@adalaguirre](https://github.com/adalaguirre) |
-| (Compañero 2) | @username |
+| Daniel Lopez | [@lopezdaniel-web](https://github.com/adalaguirre/MSE-Project.git)|
 | (Compañero 3) | @username |
