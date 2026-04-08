@@ -12,4 +12,4 @@
 | Adal Aguirre | [@adalaguirre](https://github.com/adalaguirre) |
 | Daniel Lopez | [@lopezdaniel-web](https://github.com/lopezdaniel-web) |
 | Adrian Amaro | [@adrianamaro-source](https://github.com/adrianamaro-source) |
-| (Compañero 4) | @username |
+| Carlos Cayetano | [@cynfiig](https://github.com/cynfiig) |
