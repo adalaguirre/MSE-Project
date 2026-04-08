@@ -7,6 +7,7 @@
 
 ## Team Members
 
+HEAD
 |Name|GitHub|
 |-|-|
 |Adal Aguirre|[@adalaguirre](https://github.com/adalaguirre)|
@@ -15,3 +16,9 @@
 
 
 
+| Name | GitHub |
+|------|--------|
+| Adal Aguirre | [@adalaguirre](https://github.com/adalaguirre) |
+| Daniel Lopez | [@lopezdaniel-web](https://github.com/lopezdaniel-web)|
+| (Compañero 3) | @username |
+e4ead6d1e1221a35ee6b1aeffc962dc39150f90d
