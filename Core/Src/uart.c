@@ -49,3 +49,18 @@ Uart_Status_t uart_sendString(const char *str) {
     }
     return UART_OK;
 }
+
+Uart_Status_t uart_sendUInt16(uint16_t value) {
+    char buf[6];
+    uint8_t idx = 5U;
+    buf[idx] = '\0';
+    if (value == 0U) {
+        buf[--idx] = '0';
+    } else {
+        while (value > 0U) {
+            buf[--idx] = (char)('0' + (value % 10U));
+            value /= 10U;
+        }
+    }
+    return uart_sendString(&buf[idx]);
+}

@@ -36,4 +36,6 @@ Uart_Status_t uart_init(void);
 Uart_Status_t uart_sendByte(uint8_t byte);
 Uart_Status_t uart_sendString(const char *str);
 
+Uart_Status_t uart_sendUInt16(uint16_t value);
+
 #endif /* UART_H */
