@@ -8,6 +8,8 @@
 #define GPIO_H
 
 #include <stdint.h>
+#include "clock.h"
+
 
 typedef struct {
     volatile uint32_t MODER;
@@ -25,7 +27,7 @@ typedef struct {
 #define GPIOA ((Gpio_RegDef_t *)0x40020000UL)
 #define GPIOB ((Gpio_RegDef_t *)0x40020400UL)
 
-#define RCC_AHB1ENR (*(volatile uint32_t *)0x40023830UL)
+
 
 #define GPIO_MODE_INPUT   0U
 #define GPIO_MODE_OUTPUT  1U
