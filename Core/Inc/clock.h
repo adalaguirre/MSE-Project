@@ -1,54 +1,32 @@
 /**
- * @file clock.c
- * @brief Configuracion del clock del sistema
+ * @file clock.h
+ * @brief Driver basico para configurar el clock del sistema
  * @author Adrian
  */
 
-#include "clock.h"
+#ifndef CLOCK_H
+#define CLOCK_H
 
-/* PLL: HSI 16 MHz -> SYSCLK 180 MHz
- * (16 MHz / 8) * 180 / 2 = 180 MHz
- */
-#define PLL_M   8U
-#define PLL_N   180U
-#define PLL_P   0U
+#include <stdint.h>
 
-Clock_Status_t clock_init(void) {
-    /* Encender HSI */
-    RCC_CR |= (1U << 0U);
-    while (!(RCC_CR & (1U << 1U)));
+/* RCC */
+#define RCC_BASE        0x40023800UL
+#define RCC_CR          (*(volatile uint32_t *)(RCC_BASE + 0x00UL))
+#define RCC_PLLCFGR     (*(volatile uint32_t *)(RCC_BASE + 0x04UL))
+#define RCC_CFGR        (*(volatile uint32_t *)(RCC_BASE + 0x08UL))
+#define RCC_AHB1ENR     (*(volatile uint32_t *)(RCC_BASE + 0x30UL))
+#define RCC_APB1ENR     (*(volatile uint32_t *)(RCC_BASE + 0x40UL))
+#define RCC_APB2ENR     (*(volatile uint32_t *)(RCC_BASE + 0x44UL))
 
-    /* Flash para trabajar a 180 MHz */
-    FLASH_ACR &= ~(0xFU);
-    FLASH_ACR |= (5U << 0U);
-    FLASH_ACR |= (1U << 8U);
-    FLASH_ACR |= (1U << 9U);
-    FLASH_ACR |= (1U << 10U);
+/* FLASH */
+#define FLASH_BASE      0x40023C00UL
+#define FLASH_ACR       (*(volatile uint32_t *)(FLASH_BASE + 0x00UL))
 
-    /* Prescalers: AHB /1, APB1 /4, APB2 /2 */
-    RCC_CFGR &= ~(0xFU << 4U);
+typedef enum {
+    CLOCK_OK = 0U,
+    CLOCK_ERROR = 1U
+} Clock_Status_t;
 
-    RCC_CFGR &= ~(0x7U << 10U);
-    RCC_CFGR |= (0x5U << 10U);
+Clock_Status_t clock_init(void);
 
-    RCC_CFGR &= ~(0x7U << 13U);
-    RCC_CFGR |= (0x4U << 13U);
-
-    /* Configuracion del PLL con HSI */
-    RCC_PLLCFGR = 0U;
-    RCC_PLLCFGR |= (PLL_M << 0U);
-    RCC_PLLCFGR |= (PLL_N << 6U);
-    RCC_PLLCFGR |= (PLL_P << 16U);
-
-    /* Encender PLL */
-    RCC_CR |= (1U << 24U);
-    while (!(RCC_CR & (1U << 25U)));
-
-    /* Usar PLL como clock principal */
-    RCC_CFGR &= ~(0x3U << 0U);
-    RCC_CFGR |= (0x2U << 0U);
-
-    while (((RCC_CFGR >> 2U) & 0x3U) != 0x2U);
-
-    return CLOCK_OK;
-}
+#endif /* CLOCK_H */
