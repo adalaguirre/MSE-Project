@@ -2,7 +2,7 @@
 
 **Board:** NUCLEO-F446RE (STM32F446RET6)  
 **Course:** Microcontrollers & Embedded Systems  
-**IDE:** STM32CubeIDE + HAL  
+**IDE:** STM32CubeIDE
 **Language:** C  
 
 ## Team Members
