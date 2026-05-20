@@ -1,17 +1,8 @@
 /**
  * @file    main.c
  * @brief   Osciloscopio Digital Embebido - STM32F446RE
- * @details Integracion Semana 1: clock + gpio + uart
- *          Entregable: "OSCILOSCOPE INIT OK" en terminal serie
- *
- * Pin Mapping
- * -----------
- *  PA0  -> ADC1_IN0  (entrada analogica)
- *  PA2  -> USART2_TX (debug)
- *  PA3  -> USART2_RX (debug)
- *  PA5  -> LED LD2   (debug visual)
- *  PB8  -> I2C1_SCL  (OLED)
- *  PB9  -> I2C1_SDA  (OLED)
+ * @details Integracion Semana 2: clock + gpio + uart + adc
+ *          Entregable: valor ADC impreso por UART cada 100ms
  *
  * @authors Adrian, Daniel, Carlos, Adal
  * @board   STM32F446RE Nucleo-64
@@ -22,6 +13,7 @@
 #include "clock.h"
 #include "gpio.h"
 #include "uart.h"
+#include "adc.h"
 
 static void delay_ms(uint32_t ms) {
     volatile uint32_t count;
@@ -42,19 +34,23 @@ int main(void) {
 
     /* 3. UART debug */
     uart_init();
-    uart_sendString("OSCILOSCOPE INIT OK\r\n");
-    uart_sendString("SYSCLK: 180 MHz\r\n");
-    uart_sendString("UART:   115200 baud\r\n");
+    uart_sendString("SEMANA 2: ADC POLLING TEST\r\n");
 
-    /* 4. Blink LED como indicador visual */
-    uint32_t count = 0U;
+    /* 4. ADC1 en PA0 */
+    adc_init();
+    uart_sendString("ADC INIT OK\r\n");
+
+    uint16_t adc_value = 0U;
+
     while (1) {
-        GPIOA->ODR ^= (1U << LED_PIN);
-        delay_ms(500U);
-        count++;
-        if (count % 10U == 0U) {
-            uart_sendString("ALIVE\r\n");
+        if (adc_read(&adc_value) == ADC_OK) {
+            uart_sendString("ADC = ");
+            uart_sendUInt16(adc_value);
+            uart_sendString("\r\n");
         }
+
+        GPIOA->ODR ^= (1U << LED_PIN);
+        delay_ms(100U);
     }
 
     return 0;
