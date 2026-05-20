@@ -67,3 +67,43 @@ Adc_Status_t adc_read(uint16_t *value) {
 
     return ADC_OK;
 }
+
+Adc_Status_t adc_init_triggered(void) {
+    /* Habilitar clock ADC1 */
+    RCC_APB2ENR |= (1U << 8U);
+
+    /* Prescaler ADC /4: 90 MHz / 4 = 22.5 MHz */
+    ADC_CCR &= ~(0x3U << 16U);
+    ADC_CCR |=  (0x1U << 16U);
+
+    /* Resolucion 12 bits */
+    ADC1->CR1 &= ~(0x3U << 24U);
+
+    /* Habilitar interrupcion EOC */
+    ADC1->CR1 |= (1U << 5U);
+
+    /* Trigger externo: TIM2 TRGO */
+    ADC1->CR2 &= ~(0x3U << 28U);
+    ADC1->CR2 |=  (0x1U << 28U);
+
+    ADC1->CR2 &= ~(0xFU << 24U);
+    ADC1->CR2 |=  (0x6U << 24U);
+
+    /* 1 conversion en la secuencia */
+    ADC1->SQR1 &= ~(0xFU << 20U);
+
+    /* Canal 0 PA0 */
+    ADC1->SQR3 &= ~(0x1FU << 0U);
+
+    /* Tiempo de muestreo canal 0 */
+    ADC1->SMPR2 &= ~(0x7U << 0U);
+    ADC1->SMPR2 |=  (0x4U << 0U);
+
+    /* Habilitar interrupcion ADC en NVIC: IRQ18 */
+    (*(volatile uint32_t *)0xE000E100UL) |= (1U << 18U);
+
+    /* Encender ADC */
+    ADC1->CR2 |= (1U << 0U);
+
+    return ADC_OK;
+}
