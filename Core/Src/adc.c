@@ -68,6 +68,34 @@ Adc_Status_t adc_read(uint16_t *value) {
     return ADC_OK;
 }
 
+Adc_Status_t adc_read_channel(uint8_t channel, uint16_t *value) {
+    uint32_t timeout = 100000U;
+
+    if (value == (void *)0) {
+        return ADC_ERROR_INVALID;
+    }
+
+    /* Seleccionar el canal en la secuencia regular (posicion 1) */
+    ADC1->SQR3 &= ~(0x1FU << 0U);
+    ADC1->SQR3 |=  ((uint32_t)channel & 0x1FU);
+
+    /* Iniciar conversion por software */
+    ADC1->CR2 |= (1U << ADC_SWSTART_BIT);
+
+    /* Esperar fin de conversion */
+    while (!(ADC1->SR & (1U << ADC_EOC_BIT))) {
+        if (timeout == 0U) {
+            return ADC_ERROR_TIMEOUT;
+        }
+        timeout--;
+    }
+
+    /* Leer resultado de 12 bits */
+    *value = (uint16_t)(ADC1->DR & 0x0FFFU);
+
+    return ADC_OK;
+}
+
 Adc_Status_t adc_init_triggered(void) {
     /* Habilitar clock ADC1 */
     RCC_APB2ENR |= (1U << 8U);

@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-/* Clock */
-#define SYSCLK_HZ        180000000UL
-#define APB1_CLK_HZ       45000000UL
-#define APB2_CLK_HZ       90000000UL
+/* Clock - STM32F411RE @ 100 MHz */
+#define SYSCLK_HZ        100000000UL
+#define APB1_CLK_HZ       50000000UL
+#define APB2_CLK_HZ      100000000UL
 
 /* ADC */
 #define SAMPLE_RATE_HZ    10000UL

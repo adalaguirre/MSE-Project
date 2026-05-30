@@ -12,9 +12,13 @@ Gpio_Status_t gpio_init(void) {
     RCC_AHB1ENR |= (1U << 0U);   /* GPIOAEN */
     RCC_AHB1ENR |= (1U << 1U);   /* GPIOBEN */
 
-    /* PA0 - ADC1_IN0 - Analogico */
+    /* PA0 - ADC1_IN0 - Analogico (CH1) */
     GPIOA->MODER &= ~(3U << 0U);
     GPIOA->MODER |=  (3U << 0U);
+
+    /* PA1 - ADC1_IN1 - Analogico (CH2) */
+    GPIOA->MODER &= ~(3U << 2U);
+    GPIOA->MODER |=  (3U << 2U);
 
     /* PA2 - USART2_TX - AF7 */
     GPIOA->MODER &= ~(3U << 4U);

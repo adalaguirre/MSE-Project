@@ -48,11 +48,7 @@ typedef enum {
 /* API */
 Adc_Status_t adc_init(void);
 Adc_Status_t adc_read(uint16_t *value);
-
-/**
- * @brief Configura ADC1 para ser disparado por TIM2 TRGO.
- *        La conversion inicia automaticamente con cada TRGO.
- */
+Adc_Status_t adc_read_channel(uint8_t channel, uint16_t *value);
 Adc_Status_t adc_init_triggered(void);
 
 #endif /* ADC_H */

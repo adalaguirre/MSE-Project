@@ -21,13 +21,18 @@ SRCS     = startup.c \
            Core/Src/clock.c \
            Core/Src/gpio.c \
            Core/Src/uart.c \
-           Core/Src/adc.c
+           Core/Src/adc.c \
+           Core/Src/i2c.c \
+           Core/Src/oled.c
 
 OBJS     = $(SRCS:.c=.o)
 LDFLAGS  = -nostdlib -T $(LINKER)
 
 %.o : %.c
 	$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@
+
+.PHONY: all
+all: $(EXEC)
 
 .PHONY: build
 build: $(EXEC)

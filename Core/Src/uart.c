@@ -11,7 +11,8 @@
 #define GPIOA_AFRL  (*(volatile uint32_t *)(GPIOA_BASE + 0x20UL))
 
 #define AF7             7U
-#define UART_BRR_115200 391U
+/* BRR = APB1 / baudrate = 50,000,000 / 115200 = 434 (F411 @ APB1 50 MHz) */
+#define UART_BRR_115200 434U
 
 Uart_Status_t uart_init(void) {
     RCC_AHB1ENR |= (1U << 0U);
