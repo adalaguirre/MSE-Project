@@ -49,12 +49,17 @@
 #define SAMPLE_COUNT    128U    /* Numero de muestras por frame de display */
 #define LED_TOGGLE_PIN  5U      /* PA5 = LED LD2 */
 
+/* Canales ADC de los potenciometros */
+#define POT_TIMEBASE_CH   4U    /* PA4 = ADC1_IN4 — base de tiempo */
+#define POT_AMPLITUDE_CH  8U    /* PB0 = ADC1_IN8 — zoom amplitud  */
+
 /*** Local Variables ***/
 static uint16_t adc_ch1[SAMPLE_COUNT];   /* PA0 - ADC1_IN0 */
 static uint16_t adc_ch2[SAMPLE_COUNT];   /* PA1 - ADC1_IN1 */
 
 /*** Function Prototypes ***/
 static void delay_ms(uint32_t ms);
+static void delay_between_frames(uint16_t pot_val);
 static void collect_samples(void);
 
 /*** Function Definitions ***/
@@ -73,22 +78,35 @@ static void delay_ms(uint32_t ms) {
 }
 
 /**
+ * @brief Retardo entre frames controlado por Pot 1.
+ *        Se aplica DESPUES de actualizar la pantalla, no entre muestras.
+ *        Asi el I2C nunca tiene tiempos de espera variables.
+ *
+ * @param pot_val  Lectura ADC del Pot 1 (0 a 4095).
+ */
+static void delay_between_frames(uint16_t pot_val) {
+    /* pot = 0    -> 0 ms  (maximo refresco).
+     * pot = 4095 -> 50 ms entre frames.
+     * Usa delay_ms en vez de NOP loop largo para evitar
+     * que el ST-Link pierda sincronizacion con el MCU. */
+    uint32_t ms = ((uint32_t)pot_val * 50UL) / 4095UL;
+    delay_ms(ms);
+}
+
+/**
  * @brief Recolecta SAMPLE_COUNT muestras de CH1 (PA0) y CH2 (PA1)
- *        de forma intercalada para que ambas tengan el mismo tiempo base.
+ *        tan rapido como el ADC permite.
  */
 static void collect_samples(void) {
     uint16_t i;
     uint16_t value;
 
     for (i = 0U; i < SAMPLE_COUNT; i++) {
-        /* CH1: PA0 = ADC1_IN0 */
         if (adc_read_channel(0U, &value) == ADC_OK) {
             adc_ch1[i] = value;
         } else {
             adc_ch1[i] = 0U;
         }
-
-        /* CH2: PA1 = ADC1_IN1 */
         if (adc_read_channel(1U, &value) == ADC_OK) {
             adc_ch2[i] = value;
         } else {
@@ -125,7 +143,19 @@ int main(void) {
 
     /* --- 2. Bucle principal --- */
     while (1) {
-        /* Recolectar muestras del ADC */
+        uint16_t pot_timebase  = 0U;
+        uint16_t pot_amplitude = 0U;
+        uint16_t amp_scale;
+
+        /* Leer potenciometros */
+        adc_read_channel(POT_TIMEBASE_CH,  &pot_timebase);
+        adc_read_channel(POT_AMPLITUDE_CH, &pot_amplitude);
+
+        /* Pot 2 -> escala vertical: rango 512 (4x zoom) a 4095 (sin zoom) */
+        amp_scale = (uint16_t)(512U + ((uint32_t)pot_amplitude * 3583UL / 4095UL));
+        oled_set_amplitude_scale(amp_scale);
+
+        /* Recolectar muestras a maxima velocidad */
         collect_samples();
 
         /* Limpiar el frame buffer */
@@ -145,6 +175,9 @@ int main(void) {
             i2c_init();
             oled_init();
         }
+
+        /* Pot 1: retardo entre frames (no entre muestras — evita interferir con I2C) */
+        delay_between_frames(pot_timebase);
 
         /* Heartbeat: parpadeo del LED para indicar que el sistema corre */
         GPIOA->ODR ^= (1U << LED_TOGGLE_PIN);

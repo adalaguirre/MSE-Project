@@ -36,6 +36,14 @@ Gpio_Status_t gpio_init(void) {
     GPIOA->MODER &= ~(3U << 10U);
     GPIOA->MODER |=  (1U << 10U);
 
+    /* PA4 - ADC1_IN4 - Analogico (Pot 1: base de tiempo) */
+    GPIOA->MODER &= ~(3U << 8U);
+    GPIOA->MODER |=  (3U << 8U);
+
+    /* PB0 - ADC1_IN8 - Analogico (Pot 2: zoom amplitud) */
+    GPIOB->MODER &= ~(3U << 0U);
+    GPIOB->MODER |=  (3U << 0U);
+
     /* PB8 - I2C1_SCL - AF4, open-drain, pull-up */
     GPIOB->MODER  &= ~(3U << 16U);
     GPIOB->MODER  |=  (2U << 16U);

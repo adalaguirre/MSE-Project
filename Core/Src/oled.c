@@ -84,6 +84,10 @@ static uint8_t frame_buf[OLED_PAGES * OLED_WIDTH];
 /* Buffer de TX para I2C: 1 byte de control + 128 bytes de datos por pagina */
 static uint8_t tx_page_buf[OLED_WIDTH + 1U];
 
+/* Escala de amplitud: rango ADC visible centrado en 2048.
+ * 4095 = sin zoom. 2048 = 2x. 1024 = 4x. Minimo: 256. */
+static uint16_t s_amp_scale = OLED_ADC_MAX;
+
 /*** Function Prototypes ***/
 static Oled_Status_t oled_send_cmd(const uint8_t *cmds, uint32_t len);
 
@@ -146,6 +150,12 @@ void oled_clear(void) {
     for (i = 0U; i < (OLED_PAGES * OLED_WIDTH); i++) {
         frame_buf[i] = 0x00U;
     }
+}
+
+void oled_set_amplitude_scale(uint16_t scale) {
+    if (scale < 256U)          { scale = 256U; }
+    if (scale > OLED_ADC_MAX)  { scale = OLED_ADC_MAX; }
+    s_amp_scale = scale;
 }
 
 void oled_set_pixel(uint8_t x, uint8_t y, Oled_Color_t color) {
@@ -241,10 +251,26 @@ void oled_draw_waveform(const uint16_t *samples, uint16_t n_samples) {
 
         sample_val = samples[sample_idx];
 
-        /* Mapear ADC (0-4095) a pixel Y (62 hasta 1), invertido */
-        curr_y = (uint8_t)(DISP_Y_MAX -
-                 (uint8_t)(((uint32_t)sample_val * (uint32_t)(DISP_Y_MAX - DISP_Y_MIN))
-                            / (uint32_t)OLED_ADC_MAX));
+        /* Mapear ADC al pixel Y aplicando zoom de amplitud (s_amp_scale).
+         * El centro siempre es 2048 (0V). s_amp_scale define cuanto rango
+         * ADC cabe en la pantalla: 4095=sin zoom, 2048=2x, 1024=4x.
+         */
+        {
+            int32_t center  = 2048;
+            int32_t v_min   = center - (int32_t)(s_amp_scale / 2U);
+            int32_t v_max   = center + (int32_t)(s_amp_scale / 2U);
+            int32_t sv      = (int32_t)sample_val;
+            uint32_t range  = (uint32_t)s_amp_scale;
+
+            if (v_min < 0)     { v_min = 0; }
+            if (v_max > 4095)  { v_max = 4095; }
+            if (sv < v_min)    { sv = v_min; }
+            if (sv > v_max)    { sv = v_max; }
+
+            curr_y = (uint8_t)(DISP_Y_MAX -
+                     (uint8_t)(((uint32_t)(sv - v_min) *
+                     (uint32_t)(DISP_Y_MAX - DISP_Y_MIN)) / range));
+        }
 
         /* Clampear dentro del area interior */
         if (curr_y < DISP_Y_MIN) { curr_y = DISP_Y_MIN; }

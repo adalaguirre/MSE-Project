@@ -100,6 +100,17 @@ void oled_draw_waveform(const uint16_t *samples, uint16_t n_samples);
 void oled_draw_waveform_ch2(const uint16_t *samples, uint16_t n_samples);
 
 /**
+ * @brief Ajusta el zoom vertical de las formas de onda.
+ *        Controlado por el potenciometro de amplitud (Pot 2).
+ *
+ * @param scale  Rango ADC visible centrado en 2048 (0V).
+ *               4095 = escala completa (sin zoom).
+ *               2048 = zoom 2x. 1024 = zoom 4x.
+ *               Minimo permitido: 256.
+ */
+void oled_set_amplitude_scale(uint16_t scale);
+
+/**
  * @brief Envia el frame buffer completo a la pantalla via I2C.
  *        Actualiza las 8 paginas del SSD1306.
  * @return OLED_OK si fue exitoso.
