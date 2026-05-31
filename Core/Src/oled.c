@@ -199,6 +199,15 @@ void oled_draw_grid(void) {
         oled_set_pixel(0U,                        y, OLED_COLOR_WHITE);
         oled_set_pixel((uint8_t)(OLED_WIDTH - 1U), y, OLED_COLOR_WHITE);
     }
+
+    /* --- Linea de referencia 0V en el centro (y = 32) ---
+     * Linea punteada horizontal que indica donde esta el voltaje cero.
+     * Util para visualizar cuando una senal cruza el nivel de referencia.
+     * Se dibuja cada 4 pixeles para no tapar las formas de onda.
+     */
+    for (x = 2U; x < (OLED_WIDTH - 1U); x += 4U) {
+        oled_set_pixel(x, (uint8_t)(OLED_HEIGHT / 2U), OLED_COLOR_WHITE);
+    }
 }
 
 void oled_draw_waveform(const uint16_t *samples, uint16_t n_samples) {
