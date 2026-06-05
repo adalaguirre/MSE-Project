@@ -35,7 +35,7 @@ typedef enum {
 Uart_Status_t uart_init(void);
 Uart_Status_t uart_sendByte(uint8_t byte);
 Uart_Status_t uart_sendString(const char *str);
-
 Uart_Status_t uart_sendUInt16(uint16_t value);
+Uart_Status_t uart_sendBytes(const uint8_t *buf, uint16_t len);
 
 #endif /* UART_H */

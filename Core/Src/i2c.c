@@ -64,17 +64,20 @@ typedef struct {
 /* SR2 bits */
 #define SR2_BUSY    (1U << 1U)    /* Bus ocupado */
 
-/* Clock parameters para 100 kHz Standard Mode con APB1 = 50 MHz (F411)
- * Standard mode es mas lento pero mucho mas estable para transacciones
- * consecutivas (evita el bug de BUSY en STM32F4).
+/* Clock parameters para 400 kHz Fast Mode con APB1 = 50 MHz (F411).
  *
- * CCR   = Fpclk1 / (2 * Fscl) = 50e6 / (2 * 100e3) = 250
- * TRISE = (Fpclk1 * 1000ns) + 1 = 50 + 1 = 51
- * (sin bit CCR_FS -> Standard mode)
+ * Fast Mode, Duty=0 (tlow = 2*thigh):
+ *   CCR   = Fpclk1 / (3 * Fscl) = 50e6 / (3 * 400e3) = 41.67 -> 42
+ *           Bit 15 (CCR_FS) = 1 activa Fast Mode
+ *   TRISE = (Fpclk1 * 300ns) + 1 = (50e6 * 300e-9) + 1 = 15 + 1 = 16
+ *
+ * Resultado: ~4x mas rapido que Standard Mode -> OLED fluido a ~30 FPS.
+ * El tiempo entre transacciones (capturas del ADC) provee el hold time
+ * suficiente para que el bus quede libre sin delay adicional.
  */
 #define I2C_FREQ_MHZ    50U
-#define I2C_CCR_VAL     250U
-#define I2C_TRISE_VAL   51U
+#define I2C_CCR_VAL     ((1U << 15U) | 42U)   /* FS=1, CCR=42 -> 400 kHz */
+#define I2C_TRISE_VAL   16U
 
 /* RCC: habilitar I2C1 en APB1 (bit 21) */
 #define RCC_I2C1EN      (1U << 21U)
@@ -110,7 +113,7 @@ I2c_Status_t i2c_init(void) {
     /* 3. Frecuencia del periférico (valor en MHz de APB1) */
     I2C1_DEV->CR2 = I2C_FREQ_MHZ;
 
-    /* 4. Standard mode (100 kHz) — mas estable para transacciones continuas */
+    /* 4. Fast mode (400 kHz): bit FS=1 en CCR, CCR=42 */
     I2C1_DEV->CCR = I2C_CCR_VAL;
 
     /* 5. Tiempo maximo de subida: 300 ns en fast mode */

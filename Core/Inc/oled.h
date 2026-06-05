@@ -111,6 +111,52 @@ void oled_draw_waveform_ch2(const uint16_t *samples, uint16_t n_samples);
 void oled_set_amplitude_scale(uint16_t scale);
 
 /**
+ * @brief Dibuja el contorno de un circulo usando el algoritmo de Bresenham.
+ *
+ * @param cx     Columna del centro (0 a 127).
+ * @param cy     Fila del centro (0 a 63).
+ * @param r      Radio en pixeles.
+ * @param color  OLED_COLOR_WHITE para encender, OLED_COLOR_BLACK para borrar.
+ */
+void oled_draw_circle(uint8_t cx, uint8_t cy, uint8_t r, Oled_Color_t color);
+
+/**
+ * @brief Dibuja un caracter de la fuente 5x7 en el frame buffer.
+ *        El caracter tiene 5px de ancho y 7px de alto.
+ *        La posicion 'y' debe ser multiplo de 8 (inicio de pagina).
+ *
+ * @param x  Columna de inicio (0 a 122).
+ * @param y  Fila de inicio, multiplo de 8 (0, 8, 16, 24, 32, 40, 48, 56).
+ * @param c  Caracter ASCII (32 a 126).
+ */
+void oled_draw_char(uint8_t x, uint8_t y, char c);
+
+/**
+ * @brief Dibuja una cadena de caracteres en el frame buffer.
+ *
+ * @param x    Columna de inicio.
+ * @param y    Fila de inicio, multiplo de 8.
+ * @param str  Cadena terminada en null.
+ */
+void oled_draw_string(uint8_t x, uint8_t y, const char *str);
+
+/**
+ * @brief Dibuja las barras de estado superior e inferior.
+ *        Superior: etiquetas CH1, CH2, zoom y timebase.
+ *        Inferior: voltaje actual de cada canal.
+ *
+ * @param inter_sample_us  Tiempo entre muestras en microsegundos (Pot 1).
+ *                         0 = maximo refresco (Auto). Max util: ~5000.
+ * @param freq_hz          Frecuencia estimada de CH1 en Hz (0 = sin senal).
+ * @param pot_amp          Lectura ADC del Pot 2 (0-4095) para indicar zoom.
+ * @param ch1_adc          Muestra ADC de CH1 para calcular voltaje.
+ * @param ch2_adc          Muestra ADC de CH2 para calcular voltaje.
+ */
+void oled_draw_status_bars(uint32_t inter_sample_us, uint32_t freq_hz,
+                            uint16_t pot_amp,
+                            uint16_t ch1_adc, uint16_t ch2_adc);
+
+/**
  * @brief Envia el frame buffer completo a la pantalla via I2C.
  *        Actualiza las 8 paginas del SSD1306.
  * @return OLED_OK si fue exitoso.
